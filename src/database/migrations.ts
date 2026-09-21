@@ -48,6 +48,41 @@ export const LATEST_VERSION = MIGRATIONS.reduce(
 );
 
 /**
+ * `withExclusiveTransactionAsync` nao existe na versao web do expo-sqlite: o
+ * SQLite compilado para WebAssembly nao abre transacao exclusiva, e a chamada
+ * lanca "not supported on web". Sem este desvio o app trava na tela de erro do
+ * banco no navegador.
+ *
+ * O suporte e testado uma unica vez, com uma transacao vazia, antes de executar
+ * qualquer statement - assim uma migracao nao roda pela metade e repete depois.
+ *
+ * Abrir mao da exclusividade nao custa nada aqui: `getDatabase` compartilha uma
+ * unica promessa de abertura, entao duas migracoes nunca correm em paralelo.
+ */
+let suportaTransacaoExclusiva: boolean | null = null;
+
+async function emTransacao(
+    db: SQLiteDatabase,
+    tarefa: (txn: SQLiteDatabase) => Promise<void>,
+): Promise<void> {
+    if (suportaTransacaoExclusiva === null) {
+        try {
+            await db.withExclusiveTransactionAsync(async () => undefined);
+            suportaTransacaoExclusiva = true;
+        } catch {
+            suportaTransacaoExclusiva = false;
+        }
+    }
+
+    if (suportaTransacaoExclusiva) {
+        await db.withExclusiveTransactionAsync(tarefa);
+        return;
+    }
+
+    await db.withTransactionAsync(() => tarefa(db));
+}
+
+/**
  * Aplica as migracoes pendentes. Seguro para chamar em toda abertura do app:
  * migracoes ja aplicadas sao ignoradas.
  */
@@ -67,7 +102,7 @@ export async function migrate(db: SQLiteDatabase): Promise<void> {
             continue;
         }
 
-        await db.withExclusiveTransactionAsync(async (txn) => {
+        await emTransacao(db, async (txn) => {
             for (const statement of migracao.statements) {
                 await txn.execAsync(statement);
             }

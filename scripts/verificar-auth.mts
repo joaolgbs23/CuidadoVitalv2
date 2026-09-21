@@ -120,6 +120,31 @@ await db.runAsync('INSERT INTO sessoes (id, usuario_id, criada_em, expira_em) VA
 ok('sessao expirada ignorada', (await recuperarSessao(db)) === null);
 ok('sessao expirada removida do banco', (await db.getAllAsync('SELECT * FROM sessoes;')).length === 0);
 
+// ---------- enumeracao por tempo ----------
+// A mensagem de erro ja e a mesma nos dois casos. Aqui conferimos o outro canal:
+// o tempo de resposta. Antes da correcao, conta inexistente voltava em ~0,1ms e
+// senha errada em ~625ms - uma diferenca de milhares de vezes, suficiente para
+// descobrir quais e-mails e CPFs estao cadastrados no aparelho.
+async function tempoMedioDeLoginFalho(identificador: string): Promise<number> {
+  const amostras: number[] = [];
+  for (let i = 0; i < 5; i += 1) {
+    const inicio = performance.now();
+    try { await entrar(db, identificador, 'senhaDefinitivamenteErrada9'); } catch { /* esperado */ }
+    amostras.push(performance.now() - inicio);
+  }
+  amostras.sort((a, b) => a - b);
+  return amostras[Math.floor(amostras.length / 2)]; // mediana, menos sensivel a picos
+}
+
+const tContaExiste = await tempoMedioDeLoginFalho('joao@exemplo.com');
+const tContaNaoExiste = await tempoMedioDeLoginFalho('ninguem-aqui@exemplo.com');
+const razao = tContaExiste / Math.max(tContaNaoExiste, 0.001);
+ok(
+  'tempo de login nao revela se a conta existe',
+  razao < 2 && 1 / razao < 2,
+  `existe=${tContaExiste.toFixed(1)}ms inexistente=${tContaNaoExiste.toFixed(1)}ms razao=${razao.toFixed(2)}x`,
+);
+
 // ---------- integridade ----------
 const fk = await db.getFirstAsync<{ foreign_keys: number }>('PRAGMA foreign_keys;');
 ok('foreign keys ligadas', fk?.foreign_keys === 1, String(fk?.foreign_keys));

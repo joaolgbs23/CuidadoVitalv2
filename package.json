@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/node": "^26.6.2",
     "@types/react": "~19.2.2",
+    "playwright-core": "^1.63.0",
     "tsx": "^4.20.6",
     "typescript": "~6.0.3"
   },
@@ -28,7 +29,8 @@
     "verificar": "npm run verificar:crypto && npm run verificar:auth",
     "verificar:crypto": "tsx --tsconfig scripts/tsconfig.json scripts/verificar-crypto.mts",
     "verificar:auth": "tsx --tsconfig scripts/tsconfig.json scripts/verificar-auth.mts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verificar:web": "node scripts/verificar-web.mjs"
   },
   "private": true
 }

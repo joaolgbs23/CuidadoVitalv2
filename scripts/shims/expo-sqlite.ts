@@ -26,6 +26,13 @@ export class SQLiteDatabase {
     try { await task(this); this.db.exec('COMMIT'); }
     catch (e) { this.db.exec('ROLLBACK'); throw e; }
   }
+  // Transacao comum, sem BEGIN IMMEDIATE. E para onde as migracoes caem quando
+  // a plataforma nao aceita transacao exclusiva, como acontece na web.
+  async withTransactionAsync(task: () => Promise<void>): Promise<void> {
+    this.db.exec('BEGIN');
+    try { await task(); this.db.exec('COMMIT'); }
+    catch (e) { this.db.exec('ROLLBACK'); throw e; }
+  }
   async closeAsync(): Promise<void> { this.db.close(); }
 }
 

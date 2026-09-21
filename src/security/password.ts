@@ -54,6 +54,26 @@ export async function verifyPassword(plainPassword: string, storedHash: string):
     }
 }
 
+/**
+ * Hash descartavel, com o mesmo custo dos hashes reais e senha impossivel de
+ * acertar (o campo do hash e so zeros).
+ */
+const HASH_FALSO = `${ALGORITHM}$${ITERATIONS}$${'0'.repeat(SALT_LENGTH * 2)}$${'0'.repeat(
+    KEY_LENGTH * 2,
+)}`;
+
+/**
+ * Gasta o mesmo tempo de uma verificacao real, e descarta o resultado.
+ *
+ * Serve para o login responder no mesmo tempo quando a conta nao existe. Sem
+ * isso a mensagem de erro e a mesma, mas o relogio entrega a resposta: uma conta
+ * inexistente volta em menos de 1ms, enquanto a senha errada de uma conta real
+ * paga os 40.000 ciclos do PBKDF2.
+ */
+export async function gastarTempoDeVerificacao(plainPassword: string): Promise<void> {
+    await verifyPassword(plainPassword, HASH_FALSO);
+}
+
 /** Indica se o hash foi gerado com um custo menor do que o atual e deve ser regerado. */
 export function needsRehash(storedHash: string): boolean {
     const parts = storedHash.split('$');

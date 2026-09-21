@@ -8,7 +8,12 @@
 import * as Crypto from 'expo-crypto';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import { hashPassword, needsRehash, verifyPassword } from '../security/password';
+import {
+    gastarTempoDeVerificacao,
+    hashPassword,
+    needsRehash,
+    verifyPassword,
+} from '../security/password';
 import {
     atualizarSenhaHash,
     buscarPorCpf,
@@ -173,7 +178,15 @@ export async function entrar(
     const cpf = pareceCpf(texto) ? apenasDigitos(texto) : null;
     const row = await buscarPorEmailOuCpf(db, email, cpf);
 
-    if (!row || !(await verifyPassword(senha, row.senha_hash))) {
+    if (!row) {
+        // Nao basta a mensagem ser igual: sem gastar o mesmo tempo aqui, uma
+        // conta inexistente responde na hora e uma senha errada demora os
+        // 40.000 ciclos do PBKDF2, o que revela quais contas existem.
+        await gastarTempoDeVerificacao(senha);
+        throw new AuthError('credenciais_invalidas', 'E-mail, CPF ou senha incorretos.');
+    }
+
+    if (!(await verifyPassword(senha, row.senha_hash))) {
         throw new AuthError('credenciais_invalidas', 'E-mail, CPF ou senha incorretos.');
     }
 
