@@ -7,22 +7,11 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "plugins": [
-      [
-        "react-native-vector-image",
-        {
-          // These are default options, change if you want a different value:
-          "stripSvgs": false, // if true, svgs will be removed from bundle. expo-updates package crashes when svgs it expects in the bundle are not there
-          "metroConfigFile": "metro.config.js",
-          "resetCache": false,
-          "bundleWithExpo": true,
-          "entryFile": "index.ts"
-        }
-      ]
+      "expo-sqlite"
     ],
     "ios": {
       "supportsTablet": true
     },
-    
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",

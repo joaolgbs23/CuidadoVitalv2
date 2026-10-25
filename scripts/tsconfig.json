@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "expo-crypto": ["./shims/expo-crypto.ts"],
+      "expo-sqlite": ["./shims/expo-sqlite.ts"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.mts", "../src/database/**/*.ts", "../src/security/**/*.ts", "../src/services/**/*.ts", "../src/utils/**/*.ts"]
+}
