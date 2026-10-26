@@ -27,10 +27,10 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "verificar": "npm run verificar:crypto && npm run verificar:auth",
-    "verificar:crypto": "tsx --tsconfig scripts/tsconfig.json scripts/verificar-crypto.mts",
-    "verificar:auth": "tsx --tsconfig scripts/tsconfig.json scripts/verificar-auth.mts",
+    "verificar:crypto": "tsx --tsconfig tests/tsconfig.json tests/verificar-crypto.mts",
+    "verificar:auth": "tsx --tsconfig tests/tsconfig.json tests/verificar-auth.mts",
     "typecheck": "tsc --noEmit",
-    "verificar:web": "node scripts/verificar-web.mjs"
+    "verificar:web": "node tests/verificar-web.mjs"
   },
   "private": true
 }

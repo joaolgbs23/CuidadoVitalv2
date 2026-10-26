@@ -1,0 +1,81 @@
+# Roda as verificacoes do projeto a cada push e a cada pull request.
+#
+# Existe porque dois bugs reais ja passaram por `expo export` e pelos testes de
+# Node neste repositorio: a migracao quebrada na web e a enumeracao de contas
+# por tempo no login. Sem CI, as suites so rodam se alguem lembrar.
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  verificar:
+    name: Testes e tipos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: TypeScript do aplicativo
+        run: npx tsc --noEmit
+
+      - name: TypeScript dos testes
+        run: npx tsc --noEmit -p tests/tsconfig.json
+
+      - name: Testes unitarios (SHA-256, HMAC, PBKDF2)
+        run: npm run verificar:crypto
+
+      - name: Testes de integracao (banco, cadastro, login, sessao)
+        run: npm run verificar:auth
+
+  web:
+    name: Teste de interface no navegador
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      # O teste de UI dirige o app num Chromium real. E a unica suite que enxerga
+      # diferencas do expo-sqlite entre plataformas.
+      - name: Instalar o Chromium
+        run: npx playwright-core install --with-deps chromium
+
+      - name: Rodar o app no navegador
+        run: npm run verificar:web
+
+  build:
+    name: Build das tres plataformas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Exportar android, ios e web
+        run: |
+          npx expo export --platform android --output-dir /tmp/ex-android
+          npx expo export --platform ios     --output-dir /tmp/ex-ios
+          npx expo export --platform web     --output-dir /tmp/ex-web
