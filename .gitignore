@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# PDFs gerados localmente
+docs/pdf/saida/

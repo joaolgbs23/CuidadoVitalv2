@@ -7,6 +7,9 @@
 | [`regras-de-negocio.md`](regras-de-negocio.md) | Validações de cadastro, login e sessão |
 | [`casos-de-uso.md`](casos-de-uso.md) | Casos de uso implementados |
 | [`wireframes/`](wireframes/) | Telas do aplicativo |
+| [`plano-de-testes.md`](plano-de-testes.md) | Escopo, estratégia, critérios, riscos e lacunas |
+| [`casos-de-teste.md`](casos-de-teste.md) | Casos de teste, rastreáveis até o código que os executa |
+| [`atas/`](atas/) | Atas das reuniões, com modelo para preencher |
 
 ## Pendente
 
