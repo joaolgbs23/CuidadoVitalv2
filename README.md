@@ -1,25 +1,46 @@
 # CuidadoVital
 
-Aplicativo de saúde em React Native com Expo (SDK 57).
+Aplicativo de saúde em React Native com Expo (SDK 57). Permite criar conta,
+entrar com e-mail ou CPF e permanecer logado entre aberturas, usando um banco
+SQLite no próprio aparelho — sem servidor.
+
+## Equipe
+
+<!-- TODO: preencher com os integrantes do grupo antes da entrega. -->
+
+| Integrante | GitHub | Papel |
+|---|---|---|
+| João Lucas | [@joaolgbs23](https://github.com/joaolgbs23) | Tech Lead |
+| *a preencher* | | |
+| *a preencher* | | |
 
 ## Rodando
 
+Pré-requisito: **Node.js 20 ou superior** (`node --version`).
+
 ```bash
 npm install
-npm start           # Expo Go / emulador
-npm run android
-npm run ios
-npm run web
+npm run web         # navegador, em http://localhost:8081
+npm start           # Expo Go no celular, via QR code
+npm run android     # emulador ou aparelho Android
+npm run ios         # simulador iOS (requer macOS)
 ```
+
+O banco é criado automaticamente na primeira execução. Cada pessoa, em cada
+navegador ou aparelho, tem o seu — nada é compartilhado.
 
 ## Verificação
 
 ```bash
-npm run typecheck   # TypeScript do aplicativo
-npm run verificar   # lógica de senha e de banco, rodando no Node
+npm run typecheck      # TypeScript do aplicativo
+npm run verificar      # unitários (cripto) e de integração (banco, login)
+npm run verificar:web  # interface, dirigindo o app num Chromium real
 ```
 
-Veja [`scripts/README.md`](scripts/README.md) para o que cada verificação cobre.
+Todas rodam automaticamente a cada push e pull request
+([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+
+Veja [`tests/README.md`](tests/README.md) para o que cada verificação cobre.
 
 ## Banco de dados
 
@@ -67,7 +88,11 @@ o SQLite local por uma API remota mexe nesses arquivos, não nas telas.
 ## Estrutura
 
 ```
-src/
+.github/               template de pull request e workflow de CI
+assets/                ícones e splash do aplicativo
+docs/                  arquitetura, banco, regras de negócio, casos de uso
+src/                   código-fonte
+  assets/              imagens usadas nas telas
   components/Input/    campo de texto com ícone, foco e mensagem de erro
   contexts/            AuthContext: sessão, login, cadastro, logout
   database/            conexão, migrações e consultas (SQL vive só aqui)
@@ -76,8 +101,22 @@ src/
   security/            SHA-256, HMAC, PBKDF2 e hash de senha
   services/            regras de cadastro e login
   utils/validacao.ts   CPF (com dígito verificador), e-mail, senha, nome
-scripts/               verificações que rodam no Node
+tests/                 testes unitários, de integração e de interface
 ```
+
+Documentação detalhada em [`docs/`](docs/).
+
+## Fluxo de trabalho com Git
+
+| Branch | Papel |
+|---|---|
+| `main` | Produção. Só recebe código testado e aprovado. |
+| `develop` | Integração. É daqui que saem as branches de trabalho. |
+| `feature/<nome>` | Uma tarefa. Sai de `develop` e volta para `develop` por pull request. |
+| `docs/<nome>` | Mesma regra, para mudanças só de documentação. |
+
+Ninguém commita direto em `main` ou `develop`. Todo merge passa por pull request
+com aprovação de pelo menos um outro integrante.
 
 ## Web
 

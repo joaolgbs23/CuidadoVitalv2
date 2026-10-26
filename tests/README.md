@@ -1,10 +1,18 @@
-# Scripts de verificação
+# Testes
 
-Estes scripts rodam a lógica de banco e de senha **fora do aplicativo**, no Node,
-para que dê para conferir o comportamento sem abrir um emulador.
+Três suítes, cobrindo os três níveis que o projeto precisa:
+
+| Suíte | Tipo | O que cobre |
+|---|---|---|
+| `verificar-crypto.mts` | Unitário | SHA-256, HMAC e PBKDF2 contra o módulo `crypto` do Node |
+| `verificar-auth.mts` | Integração | Migrações, cadastro, login e sessão sobre SQLite real |
+| `verificar-web.mjs` | Interface (UI) | O app rodando num Chromium real |
+
+As duas primeiras rodam **fora do aplicativo**, no Node, para que dê para
+conferir o comportamento sem abrir um emulador. A terceira abre o app de verdade.
 
 ```bash
-npm run verificar          # roda os dois
+npm run verificar          # unitários + integração
 npm run verificar:crypto   # SHA-256 / HMAC / PBKDF2 contra o módulo `crypto` do Node
 npm run verificar:auth     # migrações, cadastro, login e sessão sobre SQLite real
 ```

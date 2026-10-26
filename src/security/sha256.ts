@@ -7,7 +7,7 @@
  * nativa levaria segundos. Esta versao sincrona roda inteiramente em JS e
  * permite um PBKDF2 com custo real sem travar o cadastro.
  *
- * A saida e verificada contra o modulo `crypto` do Node em scripts/verify-crypto.
+ * A saida e verificada contra o modulo `crypto` do Node em tests/verificar-crypto.
  */
 
 const K = new Uint32Array([
